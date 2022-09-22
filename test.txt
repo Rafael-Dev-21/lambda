@@ -1,1 +1,1 @@
-(/a.(/b. a b))(/a. a)
+(((/1./succ. succ 1) (/fn.x fn x)) (/n./f./x. f (n f x)))
