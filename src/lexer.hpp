@@ -21,12 +21,12 @@ public:
 };
 
 class Lexer {
-    std::string source;
-    std::vector<Token> tokens;
-    int start = 0;
-    int current = 0;
-    int line = 1;
-    int column = 0;
+  std::string source;
+  std::vector<Token> tokens;
+  int start = 0;
+  int current = 0;
+  int line = 1;
+  int column = 0;
 
 public:
   Lexer(const std::string &source) : source(source) {}

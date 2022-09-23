@@ -1,18 +1,15 @@
 #pragma once
 #include "ast.hpp"
 #include "lexer.hpp"
-#include <vector>
 #include <memory>
+#include <vector>
 
 class Parser {
-    std::vector<Token> tokens;
-    int current = 0;
+  std::vector<Token> tokens;
+  int current = 0;
 
 public:
-  Parser(std::vector<Token> tokens)
-      : tokens(std::move(tokens)) {
-
-  }
+  Parser(std::vector<Token> tokens) : tokens(std::move(tokens)) {}
 
   std::unique_ptr<Expr> parse();
 
