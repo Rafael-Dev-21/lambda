@@ -12,7 +12,12 @@ static void run(const std::string &source) {
   SubstCtx ctx;
 
   auto result = parser.parse();
-  auto expr = dynamic_cast<Expr*>(result.get());
+  auto expr = dynamic_cast<Expr *>(result.get());
+
+  if (expr == nullptr) {
+    cerr << "Failed parsing.";
+    return;
+  }
 
   cout << expr->str() << "\n";
   cout << expr->reduce(&ctx)->str() << "\n";

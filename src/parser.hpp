@@ -1,8 +1,11 @@
 #pragma once
 #include "ast.hpp"
 #include "lexer.hpp"
+#include <exception>
 #include <memory>
 #include <vector>
+
+class ParseError : public std::exception {};
 
 class Parser {
   std::vector<Token> tokens;
@@ -15,7 +18,6 @@ public:
 
 private:
   std::unique_ptr<Expr> var();
-  std::unique_ptr<Expr> paren();
   std::unique_ptr<Expr> lambda();
   std::unique_ptr<Expr> apply();
   std::unique_ptr<Expr> expr();
@@ -26,5 +28,6 @@ private:
   bool isatend();
   Token peek();
   Token previous();
-  bool consume(int t, const std::string &msg);
+  Token consume(int t, const std::string &msg);
+  ParseError error(Token tok, const std::string &msg);
 };
