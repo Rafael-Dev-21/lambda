@@ -1,5 +1,6 @@
 #include "lexer.hpp"
 #include "parser.hpp"
+#include "interpreter.hpp"
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -9,8 +10,7 @@ using namespace std;
 static void run(const std::string &source) {
   Lexer lexer(source);
   Parser parser(lexer.lex());
-  SubstCtx ctx;
-
+  Interpreter interpreter;
   auto result = parser.parse();
   auto expr = dynamic_cast<Expr *>(result.get());
 
@@ -20,7 +20,7 @@ static void run(const std::string &source) {
   }
 
   cout << expr->str() << "\n";
-  cout << expr->reduce(&ctx)->str() << "\n";
+  cout << interpreter.eval(expr)->str() << "\n";
 }
 
 static void repl() {

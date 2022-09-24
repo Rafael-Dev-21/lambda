@@ -17,9 +17,11 @@ std::unique_ptr<Expr> Parser::lambda() {
 
 std::unique_ptr<Expr> Parser::apply() {
   auto left = expr();
+  if (!left)
+      return nullptr;
 
   while (true) {
-    if (check(')'))
+    if (check(')') || match(tok_eof))
       return left;
 
     auto right = expr();
@@ -27,28 +29,23 @@ std::unique_ptr<Expr> Parser::apply() {
       return left;
 
     left = std::make_unique<ApplyExpr>(std::move(left), std::move(right));
-
-    if (match(tok_eof))
-      return left;
   }
 }
 
 std::unique_ptr<Expr> Parser::expr() {
-  switch (advance().type) {
-  default:
-    return nullptr;
-  case tok_lambda:
-    return lambda();
-  case tok_symbol:
-    return var();
-  case tok_eof:
-    throw error(peek(), "Expected expression.");
-  case '(': {
-    auto a = apply();
-    consume(')', "Expected ')' after expression.");
-    return a;
+  if (match(tok_lambda))
+      return lambda();
+  if (match('(')) {
+      auto V = apply();
+      consume(')', "Expected ')' after expression.");
+      return V;
   }
-  }
+  if (match(tok_symbol))
+      return var();
+  if (match(tok_eof))
+      throw error(previous(), "Expected expression.");
+
+  return nullptr;
 }
 
 bool Parser::match(int t) {

@@ -42,7 +42,7 @@ void Lexer::scantok() {
 }
 
 void Lexer::symbol() {
-  while (isalnum(peek()))
+  while (isalnum(peek()) || peek() == '\'')
     advance();
 
   addtok(tok_symbol);

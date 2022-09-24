@@ -1,10 +1,10 @@
 #pragma once
 #include <memory>
 #include <string>
-#include <unordered_map>
-#include <vector>
 
-struct SubstCtx;
+
+
+struct ExprVisitor;
 
 struct Expr {
 
@@ -12,7 +12,7 @@ public:
   virtual ~Expr() = default;
   virtual std::unique_ptr<Expr> clone() const = 0;
   virtual std::string str() const = 0;
-  virtual std::unique_ptr<Expr> reduce(SubstCtx *ctx) const = 0;
+  virtual std::unique_ptr<Expr> accept(ExprVisitor *visitor) const = 0;
 };
 
 struct VarExpr : public Expr {
@@ -22,7 +22,7 @@ public:
   VarExpr(const std::string &name) : name(name) {}
   std::unique_ptr<Expr> clone() const override;
   std::string str() const override;
-  std::unique_ptr<Expr> reduce(SubstCtx *ctx) const override;
+  std::unique_ptr<Expr> accept(ExprVisitor *visitor) const override;
 };
 
 struct LambdaExpr : public Expr {
@@ -34,7 +34,7 @@ public:
       : binder(binder), body(std::move(body)) {}
   std::unique_ptr<Expr> clone() const override;
   std::string str() const override;
-  std::unique_ptr<Expr> reduce(SubstCtx *ctx) const override;
+  std::unique_ptr<Expr> accept(ExprVisitor *visitor) const override;
 };
 
 struct ApplyExpr : public Expr {
@@ -46,34 +46,14 @@ public:
       : left(std::move(left)), right(std::move(right)) {}
   std::unique_ptr<Expr> clone() const override;
   std::string str() const override;
-  std::unique_ptr<Expr> reduce(SubstCtx *ctx) const override;
+  std::unique_ptr<Expr> accept(ExprVisitor *visitor) const override;
 };
 
-struct SubstCtx {
-private:
-  struct SubstOp {
-    const std::string *from;
-    const Expr *to;
-  };
 
-  std::vector<SubstOp> args;
-  std::unordered_map<std::string, std::size_t> shadow;
-
+struct ExprVisitor {
 public:
-  struct ShadowGuard {
-    SubstCtx *ctx;
-    const std::string *binder;
-
-    ~ShadowGuard() { ctx->shadow[*binder]--; };
-  };
-
-  struct SubstGuard {
-    SubstCtx *ctx;
-
-    ~SubstGuard() { ctx->args.pop_back(); }
-  };
-
-  ShadowGuard register_shadow(const std::string &binder) noexcept;
-  SubstGuard register_subst(const std::string *from, Expr *to) noexcept;
-  std::unique_ptr<Expr> reduced_expr_for_subs(const VarExpr *expr) noexcept;
+    ~ExprVisitor() = default;
+    virtual std::unique_ptr<Expr> visitVarExpr(const VarExpr *expr) = 0;
+    virtual std::unique_ptr<Expr> visitLambdaExpr(const LambdaExpr *expr) = 0;
+    virtual std::unique_ptr<Expr> visitApplyExpr(const ApplyExpr *expr) = 0;
 };
