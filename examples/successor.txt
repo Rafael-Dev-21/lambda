@@ -1,1 +1,1 @@
-((/2.(/succ. succ 2) (/n./f./x. f (n f x))) (/f./x. f (f x)))
+((/2.(/succ. succ (succ 2)) (/n./f./x. f (n f x))) (/f./x. f (f x)))
