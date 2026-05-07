@@ -8,6 +8,7 @@
 using namespace std;
 
 static void run(const std::string &source) {
+  try {
   Lexer lexer(source);
   Parser parser(lexer.lex());
   Interpreter interpreter;
@@ -15,12 +16,15 @@ static void run(const std::string &source) {
   auto expr = dynamic_cast<Expr *>(result.get());
 
   if (expr == nullptr) {
-    cerr << "Failed parsing.";
+    cerr << "Failed parsing." << endl;
     return;
   }
 
   cout << expr->str() << "\n";
   cout << interpreter.eval(expr)->str() << "\n";
+  } catch (exception& e) {
+	  cerr << e.what() << endl;
+  }
 }
 
 static void repl() {
